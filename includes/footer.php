@@ -4,12 +4,12 @@
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <div class="footer__about">
                     <div class="footer__about__logo">
-                        <a href="./"><img src="./src/images/logo.png" alt=""></a>
+                        <a href="./"><img src="./src/images/breezelogo.png" alt="Breeze Marketplace" style="max-height:200px; width:auto;"></a>
                     </div>
                     <ul>
-                        <li>Address: Samarkand</li>
-                        <li>Phone: +998 (99) 779 99 33</li>
-                        <li>Email: iilhomjonov777@gmail.com</li>
+                        <li>Address: Namibia</li>
+                        <li>Phone: +264 (61) 123 4567</li>
+                        <li>Email: support@breezemarketplace.com</li>
                     </ul>
                 </div>
             </div>
@@ -36,13 +36,10 @@
                         <input type="text" placeholder="Enter your mail">
                         <button type="submit" class="site-btn">Subscribe</button>
                     </form>
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
                     <div class="footer__widget__social">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="https://www.instagram.com/iqbolshoh_777/"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.x.com/iqbolshoh_777/"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                        <a href="https://github.com/by-emberline" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://www.instagram.com/_ester_matias?igsh=MWY1azRjZjJ2aTNnZg==" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>

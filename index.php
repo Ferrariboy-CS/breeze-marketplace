@@ -1,4 +1,15 @@
-<?php include 'check.php'; ?>
+<?php include 'public_init.php'; ?>
+<?php
+$search = isset($_GET['q']) ? trim($_GET['q']) : '';
+$whereClause = '';
+if ($search !== '') {
+    $like = "%" . $query->validate($search) . "%";
+    $whereClause = "WHERE name LIKE '$like' OR description LIKE '$like'";
+}
+// Count products for the found indicator
+$countRes = $query->executeQuery("SELECT COUNT(*) AS cnt FROM products $whereClause");
+$foundCount = (int) $countRes->fetch_assoc()['cnt'];
+?>
 
 <!DOCTYPE html>
 <html lang="eng">
@@ -9,8 +20,8 @@
     <meta name="keywords" content="Ogani, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" href="./favicon.ico">
-    <title>iMarket | Home</title>
+    <link rel="icon" href="./src/images/Favicon.png">
+    <title>Breeze Marketplace | Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="./src/css/font-awesome.min.css" type="text/css">
@@ -33,7 +44,7 @@
                 <div class="col-lg-3 col-md-5">
                     <div class="sidebar">
                         <div class="sidebar__item">
-                            <h4>Categoriya</h4>
+                            <h4>Category</h4>
                             <ul>
                                 <?php
                                 $categories = $query->select('categories', '*');
@@ -44,32 +55,6 @@
                                 <?php endforeach; ?>
                             </ul>
                         </div>
-                        <div class="sidebar__item">
-                            <h4>Price</h4>
-                            <?php
-                            $result = $query->executeQuery("SELECT MIN(price_current) AS min_price, MAX(price_current) AS max_price FROM products");
-                            $row = $result->fetch_assoc();
-                            $min_price = $row['min_price'];
-                            $max_price = $row['max_price'];
-                            ?>
-
-                            <div class="price-range-wrap">
-                                <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
-                                    data-min="<?php echo $min_price; ?>" data-max="<?php echo $max_price; ?>">
-                                    <div class="ui-slider-range ui-corner-all ui-widget-header"></div>
-                                    <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default"></span>
-                                    <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default"></span>
-                                </div>
-                                <div class="range-slider">
-                                    <div class="price-input">
-                                        <input type="text" id="minamount" value="<?php echo $min_price; ?>">
-                                        <input type="text" id="maxamount" value="<?php echo $max_price; ?>">
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
                     </div>
                 </div>
                 <div class="col-lg-9 col-md-7">
@@ -117,8 +102,8 @@
                                                     <h5><a
                                                             onclick="openProductDetails(<?php echo $product_id; ?>)"><?php echo $product_name; ?></a>
                                                     </h5>
-                                                    <div class="product__item__price">$<?php echo $price_current; ?>
-                                                        <span>$<?php echo $price_old; ?></span>
+                                                    <div class="product__item__price">N$<?php echo $price_current; ?>
+                                                        <span>N$<?php echo $price_old; ?></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -142,7 +127,7 @@
                             </div>
                             <div class="col-lg-4 col-md-4">
                                 <div class="filter__found">
-                                    <h6><span>16</span> Products found</h6>
+                                    <h6><span><?= $foundCount; ?></span> Products found<?= $search ? ' for "' . htmlspecialchars($search) . '"' : ''; ?></h6>
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-3">
@@ -155,7 +140,7 @@
                     </div>
                     <div class="row">
                         <?php
-                        $products = $query->select('products', '*', "LIMIT 15");
+                        $products = $query->select('products', '*', ($whereClause ? $whereClause . ' ' : '') . "ORDER BY added_to_site DESC LIMIT 15");
                         foreach ($products as $product):
                             $product_name = $product['name'];
                             $category_name = $query->select('categories', 'category_name', 'WHERE id=' . $product['category_id'])[0]['category_name'];
@@ -183,8 +168,8 @@
                                         <h5><a
                                                 onclick="openProductDetails(<?php echo $product_id; ?>)"><?php echo $product_name; ?></a>
                                         </h5>
-                                        <div class="product__item__price">$<?php echo $price_current; ?>
-                                            <span>$<?php echo $price_old; ?></span>
+                                        <div class="product__item__price">N$<?php echo $price_current; ?>
+                                            <span>N$<?php echo $price_old; ?></span>
                                         </div>
                                     </div>
                                 </div>

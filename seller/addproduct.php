@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="../favicon.ico">
+  <link rel="icon" href="../src/images/Favicon.png">
   <title>Seller | Add Product</title>
   <?php include 'includes/css.php'; ?>
 </head>

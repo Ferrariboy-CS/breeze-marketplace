@@ -1,3 +1,14 @@
+<?php
+// Admin notifications: latest orders with delivery status and driver
+$notifQuery = $query->executeQuery("SELECT o.id AS order_id, o.created_at, o.status AS order_status, d.status AS delivery_status, a.name AS driver_name
+    FROM orders o
+    LEFT JOIN deliveries d ON d.order_id = o.id
+    LEFT JOIN accounts a ON d.driver_id = a.id
+    ORDER BY o.created_at DESC
+    LIMIT 5");
+$notifItems = $notifQuery->fetch_all(MYSQLI_ASSOC);
+$notifCount = count($notifItems);
+?>
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -13,7 +24,7 @@
     </ul>
 
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3">
+    <form class="form-inline ml-3" action="./users.php" method="get">
         <div class="input-group input-group-sm">
             <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search"
                 name="search">
@@ -28,16 +39,34 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="./users.php">
                 <i class="far fa-comments"></i>
-                <span class="badge badge-danger navbar-badge">3</span>
+                <span class="badge badge-danger navbar-badge"><?= $notifCount; ?></span>
             </a>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link" href="#">
+            <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-bell"></i>
-                <span class="badge badge-warning navbar-badge">15</span>
+                <span class="badge badge-warning navbar-badge"><?= $notifCount; ?></span>
             </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header"><?= $notifCount; ?> recent orders</span>
+                <div class="dropdown-divider"></div>
+                <?php if (empty($notifItems)): ?>
+                    <span class="dropdown-item">No recent orders</span>
+                <?php else: ?>
+                    <?php foreach ($notifItems as $item): ?>
+                        <a href="./index.php" class="dropdown-item">
+                            <i class="fas fa-clipboard-list mr-2"></i>
+                            Order #<?= $item['order_id']; ?> - <?= ucfirst(str_replace('_',' ', $item['delivery_status'] ?? 'pending')); ?>
+                            <span class="float-right text-muted text-sm"><?= date('m/d H:i', strtotime($item['created_at'])); ?></span>
+                            <br><small class="text-muted">Driver: <?= $item['driver_name'] ?: 'TBD'; ?> | Order: <?= ucfirst(str_replace('_',' ', $item['order_status'])); ?></small>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <a href="./index.php" class="dropdown-item dropdown-footer">View all</a>
+            </div>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i

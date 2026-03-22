@@ -23,7 +23,7 @@ if (!isset($_SESSION['loggedin']) or $_SESSION['loggedin'] !== true) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blocked Page</title>
-    <link rel="icon" href="./favicon.ico">
+    <link rel="icon" href="./src/images/Favicon.png">
     <link rel="stylesheet" href="./src/css/blocked_page.css">
 </head>
 

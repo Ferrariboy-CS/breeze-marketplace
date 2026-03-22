@@ -13,7 +13,7 @@ $cartItems = $query->getCartItems($_SESSION['id']);
     <meta name="keywords" content="Ogani, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" href="./favicon.ico">
+    <link rel="icon" href="./src/images/Favicon.png">
     <title>Shopping Cart</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/css/bootstrap.min.css" type="text/css">
@@ -99,8 +99,8 @@ $cartItems = $query->getCartItems($_SESSION['id']);
                                                 <h5><?php echo $item['name']; ?></h5>
                                             </td>
                                             <td class="shoping__cart__price">
-                                                <del>$<?php echo number_format($item['price_old'], 2); ?></del>
-                                                $<?php echo number_format($item['price_current'], 2); ?>
+                                                <del>N$<?php echo number_format($item['price_old'], 2); ?></del>
+                                                N$<?php echo number_format($item['price_current'], 2); ?>
                                             </td>
                                             <td class="shoping__cart__quantity">
                                                 <div class="quantity">
@@ -111,7 +111,7 @@ $cartItems = $query->getCartItems($_SESSION['id']);
                                                 </div>
                                             </td>
                                             <td class="shoping__cart__total">
-                                                $<?php echo number_format($item['total_price'], 2); ?>
+                                                N$<?php echo number_format($item['total_price'], 2); ?>
                                             </td>
                                             <td class="shoping__cart__item__clo">
                                                 <span onclick="removeCartItem(<?php echo $item['id']; ?>)">
@@ -136,8 +136,8 @@ $cartItems = $query->getCartItems($_SESSION['id']);
                     <div class="shoping__checkout">
                         <h5>Cart Total</h5>
                         <ul>
-                            <li>Subtotal <span>$<?php echo number_format($total_price, 2); ?></span></li>
-                            <li>Total <span>$<?php echo number_format($total_price, 2); ?></span></li>
+                            <li>Subtotal <span>N$<?php echo number_format($total_price, 2); ?></span></li>
+                            <li>Total <span>N$<?php echo number_format($total_price, 2); ?></span></li>
                         </ul>
                         <a href="checkout.php" class="primary-btn">Proceed to Checkout</a>
                     </div>

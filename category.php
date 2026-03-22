@@ -1,4 +1,4 @@
-<?php include 'check.php';
+<?php include 'public_init.php';
 
 $category_id = $query->validate($_GET['category']);
 $product_id = $query->select('products', 'id', 'where category_id = ' . $category_id);
@@ -18,8 +18,8 @@ $name = $query->select('categories', 'category_name', "where id = '$category_id'
     <meta name="keywords" content="Ogani, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" href="./favicon.ico">
-    <title>iMarket</title>
+    <link rel="icon" href="./src/images/Favicon.png">
+    <title>Breeze Marketplace</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
@@ -82,8 +82,8 @@ $name = $query->select('categories', 'category_name', "where id = '$category_id'
                                 <h5><a
                                         onclick="openProductDetails(<?php echo $product_id; ?>)"><?php echo $product_name; ?></a>
                                 </h5>
-                                <div class="product__item__price">$<?php echo $price_current; ?>
-                                    <span>$<?php echo $price_old; ?></span>
+                                <div class="product__item__price">N$<?php echo $price_current; ?>
+                                    <span>N$<?php echo $price_old; ?></span>
                                 </div>
                             </div>
                         </div>

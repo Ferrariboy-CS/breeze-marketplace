@@ -10,7 +10,7 @@ CREATE TABLE accounts (
   username VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'user',
-  status ENUM('active', 'blocked') NOT NULL DEFAULT 'active',
+  status ENUM('active', 'blocked', 'pending') NOT NULL DEFAULT 'active',
   registration_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
@@ -64,17 +64,76 @@ CREATE TABLE wishes (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
+CREATE TABLE driver_profiles (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  account_id INT(11) NOT NULL,
+  area VARCHAR(255) NOT NULL,
+  vehicle VARCHAR(100) DEFAULT NULL,
+  status ENUM('pending', 'active', 'blocked') NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE orders (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  user_id INT(11) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  area VARCHAR(255) NOT NULL,
+  total_old DECIMAL(10,2) NOT NULL DEFAULT 0,
+  total_current DECIMAL(10,2) NOT NULL DEFAULT 0,
+  payment_method ENUM('visa', 'cod') NOT NULL DEFAULT 'visa',
+  payment_status ENUM('pending', 'paid', 'failed') NOT NULL DEFAULT 'pending',
+  card_last4 VARCHAR(4) DEFAULT NULL,
+  paid_at TIMESTAMP NULL DEFAULT NULL,
+  status ENUM('pending', 'awaiting_driver', 'assigned', 'delivered', 'failed') NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES accounts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE order_items (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  order_id INT(11) NOT NULL,
+  product_id INT(11) NOT NULL,
+  quantity INT(11) NOT NULL,
+  price_old DECIMAL(10,2) NOT NULL,
+  price_current DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE TABLE deliveries (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  order_id INT(11) NOT NULL,
+  driver_id INT(11) DEFAULT NULL,
+  status ENUM('awaiting_driver', 'assigned', 'accepted', 'picked_up', 'en_route', 'delivered', 'failed') NOT NULL DEFAULT 'awaiting_driver',
+  assigned_at TIMESTAMP NULL DEFAULT NULL,
+  picked_at TIMESTAMP NULL DEFAULT NULL,
+  delivered_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY unique_order (order_id),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (driver_id) REFERENCES accounts(id) ON DELETE SET NULL
+);
+
 -- ==============================  
 -- 📥 DATA INSERTION (COMPLETE)  
 -- ==============================  
--- DEFAULT PASSWORD: "IQBOLSHOH" (HASHED FOR SECURITY)  
+-- DEFAULT PASSWORD: "pass.123" (HASHED FOR SECURITY)  
 -- ==============================  
 
 INSERT INTO accounts (id, name, number, email, username, password, role, status, registration_date) VALUES
-(1, 'Iqbolshoh', '+998997799333', 'Iqbolshoh@gmail.com', 'Iqbolshoh', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'admin', 'active', '2024-05-14 11:17:25'),
-(2, 'seller', '+998997733999', 'seller@gmail.com', 'seller', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'seller', 'active', '2024-05-14 11:17:25'),
-(3, 'user', '+998993399777', 'user@gmail.com', 'user', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'user', 'active', '2024-05-14 11:17:25'),
-(4, 'userAKA', '+998993399177', 'userAKA@gmail.com', 'userAKA', '52be5ff91284c65bac56f280df55f797a5c505f7ef66317ff358e34791507027', 'user', 'active', '2024-05-14 11:17:25');
+(1, 'Admin', '+998997799333', 'admin@gmail.com', 'admin', 'b3bf15d7441a7b38bf561bdc8d7ec481b359246fd13c06fc5f5840785bdade70', 'admin', 'active', '2024-05-14 11:17:25'),
+(2, 'seller', '+998997733999', 'seller@gmail.com', 'seller', 'b3bf15d7441a7b38bf561bdc8d7ec481b359246fd13c06fc5f5840785bdade70', 'seller', 'active', '2024-05-14 11:17:25'),
+(3, 'user', '+998993399777', 'user@gmail.com', 'user', 'b3bf15d7441a7b38bf561bdc8d7ec481b359246fd13c06fc5f5840785bdade70', 'user', 'active', '2024-05-14 11:17:25'),
+(4, 'userAKA', '+998993399177', 'userAKA@gmail.com', 'userAKA', 'b3bf15d7441a7b38bf561bdc8d7ec481b359246fd13c06fc5f5840785bdade70', 'user', 'active', '2024-05-14 11:17:25'),
+(5, 'Driver One', '+998991234567', 'driver1@gmail.com', 'driver1', 'b3bf15d7441a7b38bf561bdc8d7ec481b359246fd13c06fc5f5840785bdade70', 'driver', 'active', '2024-05-14 11:17:25');
+
+INSERT INTO driver_profiles (account_id, area, vehicle, status) VALUES
+(5, 'Central City', 'Bike', 'active');
 
 INSERT INTO categories (id, category_name) VALUES
 (1, 'Phone'),

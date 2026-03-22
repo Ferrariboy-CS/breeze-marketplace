@@ -26,7 +26,7 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
 
     $username = $_COOKIE['username'];
 
-    $result = $query->select('accounts', 'id, role', "WHERE username = '$username'");
+    $result = $query->select('accounts', 'id, role, status', "WHERE username = '$username'");
  
     if (!empty($result)) {
         $user = $result[0];
@@ -35,12 +35,19 @@ if (isset($_COOKIE['username']) && isset($_COOKIE['session_token'])) {
         $_SESSION['username'] = $_COOKIE['username'];
         $_SESSION['id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
+        $_SESSION['status'] = $user['status'];
 
         if ($user['role'] == 'admin') {
             header("Location: ../admin/");
             exit;
         } else if ($user['role'] == 'seller') {
             header("Location: ../seller/");
+        } else if ($user['role'] == 'driver') {
+            if ($user['status'] === 'pending') {
+                header("Location: ../driver/pending.php");
+                exit;
+            }
+            header("Location: ../driver/");
         } else {
             header("Location: ../");
             exit;
@@ -67,6 +74,7 @@ if (isset($_POST['submit'])) {
             $_SESSION['email'] = isset($user[0]['email']) ? $user[0]['email'] : null;
             $_SESSION['username'] = isset($user[0]['username']) ? $user[0]['username'] : null;
             $_SESSION['role'] = isset($user[0]['role']) ? $user[0]['role'] : 'user';
+            $_SESSION['status'] = isset($user[0]['status']) ? $user[0]['status'] : null;
 
             setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
             setcookie('session_token',  session_id(), time() + (86400 * 30), "/", "", true, true);
@@ -76,6 +84,13 @@ if (isset($_POST['submit'])) {
                 exit;
             } else if ($user[0]['role'] == 'seller') {
                 header("Location: ../seller/");
+            } else if ($user[0]['role'] == 'driver') {
+                if ($user[0]['status'] === 'pending') {
+                    header("Location: ../driver/pending.php");
+                    exit;
+                }
+                header("Location: ../driver/");
+                exit;
             } else {
                 header("Location: ../");
                 exit;
@@ -96,7 +111,7 @@ if (isset($_POST['submit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="../src/images/Favicon.png">
     <link rel="stylesheet" href="../src/css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

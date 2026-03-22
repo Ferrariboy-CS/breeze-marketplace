@@ -17,7 +17,7 @@ $product = $query->getProduct($product_id);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product | <?php echo $product['name']; ?></title>
-    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="../src/images/Favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../src/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../src/css/font-awesome.min.css" type="text/css">
@@ -59,8 +59,8 @@ $product = $query->getProduct($product_id);
                     <div class="product__details__text">
                         <h3><?php echo $product['name']; ?></h3>
                         <div class="product-price">
-                            <div class="product__item__price">$<?php echo $product['price_current'] ?>
-                                <span>$<?php echo $product['price_old'] ?></span>
+                            <div class="product__item__price">N$<?php echo $product['price_current'] ?>
+                                <span>N$<?php echo $product['price_old'] ?></span>
                             </div>
                         </div>
 

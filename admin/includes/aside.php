@@ -11,18 +11,18 @@
         <div class="sidebar">
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="../src/images/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                    <img src="../src/images/Admin%20Pic.jpg" class="img-circle elevation-2" alt="Admin Picture" style="width: 60px; height: 60px; object-fit: cover;">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block"><?php echo $_SESSION['name']; ?></a>
+                    <span class="d-block text-white"><?php echo $_SESSION['name']; ?></span>
                 </div>
             </div>
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
-                    <li class="nav-item has-treeview <?php echo ($Page === 'users') ? 'menu-open' : ''; ?>">
-                        <a href="#" class="nav-link <?php echo ($Page === 'users') ? 'active' : ''; ?>">
+                    <li class="nav-item has-treeview <?php echo ($Page === 'users' || $Page === 'drivers') ? 'menu-open' : ''; ?>">
+                        <a href="#" class="nav-link <?php echo ($Page === 'users' || $Page === 'drivers') ? 'active' : ''; ?>">
                             <i class="nav-icon fas fa-table"></i>
                             <p>
                                 Users
@@ -42,6 +42,14 @@
                                 <a href="users.php" class="nav-link <?php echo ($Menu === 'users') ? 'active' : ''; ?>">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Users</p>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="drivers.php" class="nav-link <?php echo ($Menu === 'drivers') ? 'active' : ''; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Drivers</p>
                                 </a>
                             </li>
                         </ul>

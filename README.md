@@ -1,4 +1,4 @@
-# PHP MySQL Marketplace
+# Breeze Marketplace - PHP MySQL Platform
 
 This is an online marketplace platform built using PHP and MySQL, where users can buy and sell products through separate customer, seller, and admin areas.
 
@@ -13,6 +13,7 @@ This is an online marketplace platform built using PHP and MySQL, where users ca
 - Category browsing, price-range UI, and wishlist support
 - Shopping cart and checkout summary flow
 - Admin management for seller and user accounts, including blocking and unblocking
+- Delivery drivers with self-signup, admin approval, auto-assignment by area, and status updates
 
 ---
 
@@ -20,10 +21,11 @@ This is an online marketplace platform built using PHP and MySQL, where users ca
 
 ![Login Roles](./src/images/roles.png?raw=true)
 
-- Admin login: `Iqbolshoh`
+- Admin login: `admin`
 - Seller login: `seller`
 - User login: `user`
-- Password: `IQBOLSHOH`
+- Driver login: `driver1`
+- Password: `pass.123`
 
 ---
 
@@ -52,6 +54,12 @@ This is an online marketplace platform built using PHP and MySQL, where users ca
 - Can browse products by category
 - Can add items to the cart and wishlist
 - Can continue to the checkout summary page
+
+### Driver
+
+- Signs up, waits for admin approval
+- Sees assigned deliveries in the driver dashboard
+- Updates delivery status (accepted → picked_up → en_route → delivered/failed)
 
 ---
 
@@ -168,7 +176,7 @@ You can reach the project author on these platforms:
 				</a>
 			</td>
 			<td>
-				<a href="mailto:iilhomjonov777@gmail.com" target="_blank">
+				<a href="mailto:support@breezemarketplace.com" target="_blank">
 					<img src="https://github.com/gayanvoice/github-active-users-monitor/blob/master/public/images/icons/gmail.svg"
 							 height="40" width="40" alt="Email" title="Email" />
 				</a>

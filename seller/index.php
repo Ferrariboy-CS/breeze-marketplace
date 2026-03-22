@@ -12,7 +12,7 @@ $seller_id = $_SESSION['id'];
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="../src/images/Favicon.png">
     <title>AdminLTE 3 | My Products</title>
     <?php include 'includes/css.php'; ?>
     <link rel="stylesheet" href="../src/css/card.css" type="text/css">
@@ -43,17 +43,34 @@ $seller_id = $_SESSION['id'];
             <section class="content">
                 <div class="container-fluid">
 
+                    <?php
+                    $sellerOrderStats = $query->executeQuery("SELECT 
+                        COUNT(DISTINCT o.id) AS total_orders,
+                        SUM(CASE WHEN o.status = 'delivered' THEN 1 ELSE 0 END) AS delivered_orders,
+                        SUM(CASE WHEN o.status = 'awaiting_driver' OR o.status = 'assigned' THEN 1 ELSE 0 END) AS in_delivery,
+                        SUM(oi.quantity) AS units_sold
+                        FROM orders o
+                        JOIN order_items oi ON oi.order_id = o.id
+                        JOIN products p ON oi.product_id = p.id
+                        WHERE p.seller_id = $seller_id");
+                    $statsRow = $sellerOrderStats->fetch_assoc();
+                    $totalOrders = (int) $statsRow['total_orders'];
+                    $deliveredOrders = (int) $statsRow['delivered_orders'];
+                    $inDelivery = (int) $statsRow['in_delivery'];
+                    $unitsSold = (int) $statsRow['units_sold'];
+                    ?>
+
                     <div class="row">
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3>150</h3>
-                                    <p>New Orders</p>
+                                    <h3><?= $totalOrders; ?></h3>
+                                    <p>Total Orders</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i
+                                <a href="./orders.php" class="small-box-footer">View orders <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -61,13 +78,13 @@ $seller_id = $_SESSION['id'];
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>53<sup style="font-size: 20px">%</sup></h3>
-                                    <p>Bounce Rate</p>
+                                    <h3><?= $deliveredOrders; ?></h3>
+                                    <p>Delivered Orders</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-stats-bars"></i>
+                                    <i class="ion ion-checkmark"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i
+                                <a href="./orders.php" class="small-box-footer">View orders <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -75,13 +92,13 @@ $seller_id = $_SESSION['id'];
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3>44</h3>
-                                    <p>User Registrations</p>
+                                    <h3><?= $inDelivery; ?></h3>
+                                    <p>Out for Delivery</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-person-add"></i>
+                                    <i class="ion ion-android-bus"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i
+                                <a href="./orders.php" class="small-box-footer">View orders <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -89,13 +106,13 @@ $seller_id = $_SESSION['id'];
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-danger">
                                 <div class="inner">
-                                    <h3>65</h3>
-                                    <p>Unique Visitors</p>
+                                    <h3><?= $unitsSold; ?></h3>
+                                    <p>Units Sold</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-pie-graph"></i>
+                                    <i class="ion ion-cube"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i
+                                <a href="./orders.php" class="small-box-footer">View orders <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -125,8 +142,8 @@ $seller_id = $_SESSION['id'];
                                 <div class="product__discount__item__text">
                                     <span><?php echo $category_name ?></span>
                                     <h5><a href="#"><?php echo $product['name'] ?></a></h5>
-                                    <div class="product__item__price">$<?php echo $product['price_current'] ?>
-                                        <span>$<?php echo $product['price_old'] ?></span>
+                                    <div class="product__item__price">N$<?php echo $product['price_current'] ?>
+                                        <span>N$<?php echo $product['price_old'] ?></span>
                                     </div>
                                 </div>
                             </div>

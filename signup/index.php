@@ -57,6 +57,8 @@ if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $driver_area = isset($_POST['driver_area']) ? $_POST['driver_area'] : '';
+    $driver_vehicle = isset($_POST['driver_vehicle']) ? $_POST['driver_vehicle'] : '';
 
     $existingUser = $query->executeQuery("SELECT * FROM accounts WHERE username='$username' OR email='$email' OR number='$number'");
 
@@ -69,6 +71,15 @@ if (isset($_POST['submit'])) {
         $result = $query->registerUser($name, $number, $email, $username, $password, $role);
         $userData = $query->executeQuery("SELECT * FROM accounts WHERE username='$username'")->fetch_assoc();
 
+        if ($role === 'driver' && !empty($userData['id'])) {
+            $query->insert('driver_profiles', [
+                'account_id' => $userData['id'],
+                'area' => $query->validate($driver_area),
+                'vehicle' => $query->validate($driver_vehicle),
+                'status' => 'pending'
+            ]);
+        }
+
         if (!empty($result) && !empty($userData) && isset($userData['id'])) {
             $_SESSION['loggedin'] = true;
             $_SESSION['id'] = $userData['id'];
@@ -77,21 +88,26 @@ if (isset($_POST['submit'])) {
             $_SESSION['email'] = $email;
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $role;
+            $_SESSION['status'] = $userData['status'];
 
             setcookie('username', $username, time() + (86400 * 30), "/", "", true, true);
             setcookie('session_token',  session_id(), time() + (86400 * 30), "/", "", true, true);
 
             $msg = [
                 "title" => "Success!",
-                "text" => "Registration completed!",
+                "text" => ($role === 'driver') ? "Account submitted. Wait for admin approval." : "Registration completed!",
                 "icon" => "success"
             ];
 
-            if ($user[0]['role'] == 'admin') {
+            if ($role === 'admin') {
                 header("Location: ../admin/");
                 exit;
-            } else if ($user[0]['role'] == 'seller') {
+            } else if ($role === 'seller') {
                 header("Location: ../seller/");
+                exit;
+            } else if ($role === 'driver') {
+                header("Location: ../driver/pending.php");
+                exit;
             } else {
                 header("Location: ../");
                 exit;
@@ -115,7 +131,7 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
     <link rel="stylesheet" href="../src/css/login.css">
-    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="../src/images/Favicon.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -167,7 +183,19 @@ if (isset($_POST['submit'])) {
                     <option value="" disabled selected>Select Role</option>
                     <option value="user">User</option>
                     <option value="seller">Seller</option>
+                    <option value="driver">Driver</option>
                 </select>
+            </div>
+
+            <div id="driver-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="driver_area">Service Area</label>
+                    <input type="text" name="driver_area" id="driver_area" placeholder="Example: Central City" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="driver_vehicle">Vehicle (optional)</label>
+                    <input type="text" name="driver_vehicle" id="driver_vehicle" placeholder="Bike / Car" maxlength="100">
+                </div>
             </div>
 
 
@@ -377,6 +405,25 @@ if (isset($_POST['submit'])) {
                     });
                 }
             });
+        });
+
+        $(document).ready(function() {
+            const roleSelect = document.getElementById('role');
+            const driverFields = document.getElementById('driver-fields');
+            const driverArea = document.getElementById('driver_area');
+
+            function toggleDriver() {
+                if (roleSelect.value === 'driver') {
+                    driverFields.style.display = 'block';
+                    driverArea.required = true;
+                } else {
+                    driverFields.style.display = 'none';
+                    driverArea.required = false;
+                }
+            }
+
+            roleSelect.addEventListener('change', toggleDriver);
+            toggleDriver();
         });
 
         function hideErrorMessage() {

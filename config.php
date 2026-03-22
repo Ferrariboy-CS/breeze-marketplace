@@ -101,7 +101,8 @@ class Database
             'email' => $email,
             'username' => $username,
             'password' => $password_hash,
-            'role' => $role
+            'role' => $role,
+            'status' => ($role === 'driver') ? 'pending' : 'active'
         );
 
         $user_id = $this->insert('accounts', $data);
@@ -268,5 +269,113 @@ class Database
         } else {
             return false;
         }
+    }
+
+    public function findDriverByArea($area)
+    {
+        $stmt = $this->conn->prepare("SELECT a.id FROM driver_profiles dp JOIN accounts a ON dp.account_id = a.id WHERE dp.status = 'active' AND a.status = 'active' AND a.role = 'driver' AND dp.area = ? LIMIT 1");
+        $stmt->bind_param('s', $area);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $result ? $result['id'] : null;
+    }
+
+    public function createDelivery($orderId, $driverId, $status = 'awaiting_driver')
+    {
+        $data = array(
+            'order_id' => $orderId,
+            'driver_id' => $driverId,
+            'status' => $status,
+            'assigned_at' => ($driverId && $status !== 'awaiting_driver') ? date('Y-m-d H:i:s') : null
+        );
+
+        $columns = array();
+        $values = array();
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                $columns[] = $key;
+                $values[] = 'NULL';
+            } else {
+                $columns[] = $key;
+                $values[] = "'" . $this->conn->real_escape_string($value) . "'";
+            }
+        }
+
+        $sql = "INSERT INTO deliveries (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $values) . ")";
+        return $this->executeQuery($sql);
+    }
+
+    public function getDeliveriesByDriver($driverId)
+    {
+        $stmt = $this->conn->prepare("SELECT d.id AS delivery_id, d.status, d.assigned_at, d.picked_at, d.delivered_at, o.id AS order_id, o.address, o.area, o.total_current, o.total_old, o.status AS order_status, o.created_at FROM deliveries d JOIN orders o ON d.order_id = o.id WHERE d.driver_id = ? ORDER BY d.updated_at DESC");
+        $stmt->bind_param('i', $driverId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $result;
+    }
+
+    public function getDeliveryForDriver($deliveryId, $driverId)
+    {
+        $stmt = $this->conn->prepare("SELECT d.*, o.user_id FROM deliveries d JOIN orders o ON d.order_id = o.id WHERE d.id = ? AND d.driver_id = ?");
+        $stmt->bind_param('ii', $deliveryId, $driverId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $result;
+    }
+
+    public function updateDeliveryStatus($deliveryId, $driverId, $status)
+    {
+        $validStatuses = ['accepted', 'picked_up', 'en_route', 'delivered', 'failed'];
+        if (!in_array($status, $validStatuses)) {
+            return false;
+        }
+
+        $timestamps = [
+            'accepted' => 'assigned_at',
+            'picked_up' => 'picked_at',
+            'en_route' => null,
+            'delivered' => 'delivered_at',
+            'failed' => null
+        ];
+
+        $timeColumn = $timestamps[$status];
+        $timeValue = $timeColumn ? date('Y-m-d H:i:s') : null;
+
+        $setParts = ["status = '" . $this->conn->real_escape_string($status) . "'"];
+        if ($timeColumn) {
+            $setParts[] = "$timeColumn = '" . $this->conn->real_escape_string($timeValue) . "'";
+        }
+
+        $setClause = implode(', ', $setParts);
+
+        $stmt = $this->conn->prepare("UPDATE deliveries SET $setClause WHERE id = ? AND driver_id = ?");
+        $stmt->bind_param('ii', $deliveryId, $driverId);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        if ($result) {
+            $orderStatusMap = [
+                'accepted' => 'assigned',
+                'picked_up' => 'assigned',
+                'en_route' => 'assigned',
+                'delivered' => 'delivered',
+                'failed' => 'failed'
+            ];
+            $orderStatus = isset($orderStatusMap[$status]) ? $orderStatusMap[$status] : 'assigned';
+            $this->executeQuery("UPDATE orders o JOIN deliveries d ON o.id = d.order_id SET o.status = '" . $this->conn->real_escape_string($orderStatus) . "' WHERE d.id = " . (int) $deliveryId);
+        }
+
+        return $result;
+    }
+
+    public function clearCart($userId)
+    {
+        $stmt = $this->conn->prepare("DELETE FROM cart WHERE user_id = ?");
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $stmt->close();
     }
 }

@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="../src/images/Favicon.png">
     <title>AdminLTE 3 | Sellers</title>
     <?php include 'includes/css.php'; ?>
 </head>
@@ -32,71 +32,126 @@
             pagePath('Sellers', $arr);
             ?>
 
+            <?php
+            $stats = $query->executeQuery("SELECT 
+                (SELECT COUNT(*) FROM accounts WHERE role='seller') AS sellers,
+                (SELECT COUNT(*) FROM accounts WHERE role='user') AS users,
+                (SELECT COUNT(*) FROM accounts WHERE role='driver') AS drivers,
+                (SELECT COUNT(*) FROM products) AS products,
+                (SELECT COUNT(*) FROM categories) AS categories,
+                (SELECT COUNT(*) FROM orders) AS orders_total,
+                (SELECT SUM(total_current) FROM orders) AS revenue_total,
+                (SELECT COUNT(*) FROM orders WHERE status='awaiting_driver' OR status='assigned') AS orders_in_delivery,
+                (SELECT COUNT(*) FROM orders WHERE status='delivered') AS orders_delivered
+            ")->fetch_assoc();
+            ?>
+
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3>
-                                        <?php print_r($query->executeQuery('SELECT * FROM accounts WHERE role = "seller"')->num_rows) ?>
-                                    </h3>
+                                    <h3><?= (int)$stats['sellers']; ?></h3>
                                     <p>Sellers</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
-
                                 </div>
-                                <a href="./sellers.php" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <span class="small-box-footer" style="cursor:default;">&nbsp;</span>
                             </div>
                         </div>
 
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3><?php print_r($query->executeQuery('SELECT * FROM accounts WHERE role = "user"')->num_rows) ?>
-                                    </h3>
+                                    <h3><?= (int)$stats['users']; ?></h3>
                                     <p>Users</p>
                                 </div>
                                 <div class="icon">
-
-                                    <i class="ion ion-stats-bars"></i>
+                                    <i class="ion ion-person"></i>
                                 </div>
-                                <a href="./users.php" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <span class="small-box-footer" style="cursor:default;">&nbsp;</span>
                             </div>
                         </div>
 
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3><?php print_r($query->executeQuery('SELECT * FROM categories')->num_rows) ?>
-                                    </h3>
-                                    <p>Product types</p>
+                                    <h3><?= (int)$stats['orders_total']; ?></h3>
+                                    <p>Total Orders</p>
                                 </div>
-
                                 <div class="icon">
-                                    <i class="ion ion-person-add"></i>
+                                    <i class="ion ion-clipboard"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <a href="./users.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
 
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-danger">
                                 <div class="inner">
-                                    <h3><?php print_r($query->executeQuery('SELECT * FROM products')->num_rows) ?>
-                                    </h3>
-                                    <p>Number of products</p>
-
+                                    <h3>N$<?= number_format((float)$stats['revenue_total'], 2); ?></h3>
+                                    <p>Total Revenue</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-pie-graph"></i>
+                                    <i class="ion ion-social-usd"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <a href="./users.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-secondary">
+                                <div class="inner">
+                                    <h3><?= (int)$stats['drivers']; ?></h3>
+                                    <p>Drivers</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-android-car"></i>
+                                </div>
+                                <a href="./drivers.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3><?= (int)$stats['products']; ?></h3>
+                                    <p>Products</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-cube"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3><?= (int)$stats['orders_delivered']; ?></h3>
+                                    <p>Delivered Orders</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-checkmark"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3><?= (int)$stats['orders_in_delivery']; ?></h3>
+                                    <p>Out for Delivery</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-android-bus"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                     </div>
